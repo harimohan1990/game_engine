@@ -1,0 +1,2515 @@
+                    ┌─────────────────────┐
+                    │     Game / App      │
+                    │   Game Logic / ECS  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │     Engine Core     │
+                    ├─────────────────────┤
+                    │ Game Loop           │
+                    │ Time / Clock        │
+                    │ Event System        │
+                    │ Entity Management    │
+                    │ Resource Management  │
+                    └──────────┬──────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+┌───────▼───────┐      ┌───────▼───────┐      ┌──────▼───────┐
+│   Rendering   │      │    Physics    │      │     Audio    │
+├───────────────┤      ├───────────────┤      ├──────────────┤
+│ Renderer      │      │ Collision     │      │ Sound        │
+│ Materials     │      │ Rigid Bodies  │      │ Music        │
+│ Shaders       │      │ Raycast       │      │ Mixer        │
+│ Textures      │      │ Constraints   │      │ 3D Audio     │
+│ Lighting      │      │ Simulation    │      │ Effects      │
+└───────┬───────┘      └───────────────┘      └──────────────┘
+        │
+┌───────▼───────────────────────────────────────────────┐
+│                    Platform Layer                     │
+├───────────────────────────────────────────────────────┤
+│ Window │ Input │ File System │ Threads │ Networking   │
+└───────────────────────┬───────────────────────────────┘
+                        │
+                ┌───────▼────────┐
+                │     OS / GPU   │
+                │ Windows/Linux  │
+                │ macOS / Vulkan │
+                │ OpenGL / DX12  │
+                └────────────────┘
+
+                ## 🎮 Game Engine Components
+
+A game engine is usually divided into these major components:
+
+```text
+                    GAME ENGINE
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+       CORE           RUNTIME           TOOLS
+        │                │                │
+        ▼                ▼                ▼
+   Game Loop         Rendering         Editor
+   Memory            Physics           Profiler
+   Events            Audio             Debugger
+   ECS               Animation         Asset Tools
+   Threads           Input
+                     Networking
+                     Scripting
+```
+
+### 1. Core Engine
+
+The foundation of the engine.
+
+* Game Loop
+* Time / Delta Time
+* Memory Management
+* Logging
+* Event System
+* Configuration
+* Threading / Job System
+* Entity Component System (ECS)
+
+```text
+Core
+├── GameLoop
+├── Time
+├── Memory
+├── Events
+├── Logger
+├── Threads
+└── ECS
+```
+
+### 2. Rendering Engine
+
+Responsible for displaying graphics.
+
+```text
+Renderer
+├── Graphics API
+├── Camera
+├── Mesh
+├── Texture
+├── Material
+├── Shader
+├── Lighting
+├── Shadows
+├── Post Processing
+└── Particle System
+```
+
+Typical pipeline:
+
+```text
+Scene
+  ↓
+Culling
+  ↓
+Render Queue
+  ↓
+Shaders
+  ↓
+GPU
+  ↓
+Screen
+```
+
+### 3. Physics Engine
+
+Handles physical simulation.
+
+```text
+Physics
+├── Rigid Body
+├── Collider
+├── Collision Detection
+├── Collision Resolution
+├── Raycast
+├── Gravity
+├── Constraints
+└── Physics World
+```
+
+### 4. Input System
+
+Handles player interaction.
+
+```text
+Input
+├── Keyboard
+├── Mouse
+├── Gamepad
+├── Touch
+└── Input Mapping
+```
+
+Example:
+
+```text
+W / ↑ / Gamepad Stick
+          ↓
+    MoveForward
+          ↓
+      Player
+```
+
+### 5. Audio Engine
+
+```text
+Audio
+├── Audio Source
+├── Audio Listener
+├── Sound Effects
+├── Music
+├── Mixer
+├── 3D Audio
+└── Audio Streaming
+```
+
+### 6. Animation System
+
+```text
+Animation
+├── Skeleton
+├── Bones
+├── Animation Clips
+├── Animator
+├── State Machine
+├── Blend Tree
+└── IK
+```
+
+Example:
+
+```text
+Idle → Walk → Run → Jump → Fall → Idle
+```
+
+### 7. Scene Management
+
+Manages the game world.
+
+```text
+Scene
+├── Entities
+├── Components
+├── Cameras
+├── Lights
+├── Environment
+└── Systems
+```
+
+Example:
+
+```text
+Level 1
+ ├── Player
+ ├── Enemies
+ ├── Buildings
+ ├── Lights
+ └── Camera
+```
+
+### 8. Asset Management
+
+Loads and caches game resources.
+
+```text
+Asset Manager
+├── Models
+├── Textures
+├── Shaders
+├── Materials
+├── Audio
+├── Animations
+└── Scenes
+```
+
+Important features:
+
+* Asset loading
+* Asset caching
+* Resource lifetime management
+* Hot reload
+* Asset serialization
+
+### 9. Scripting / Gameplay
+
+Where game-specific logic lives.
+
+```text
+Gameplay
+├── Player
+├── Enemy
+├── Weapons
+├── Quests
+├── Inventory
+├── AI
+└── Game Rules
+```
+
+### 10. AI System
+
+```text
+AI
+├── Navigation
+├── Pathfinding
+├── Behavior Trees
+├── State Machines
+├── Decision Making
+└── Perception
+```
+
+### 11. Networking
+
+For multiplayer games.
+
+```text
+Networking
+├── Client
+├── Server
+├── Replication
+├── Serialization
+├── Prediction
+├── Interpolation
+└── Synchronization
+```
+
+### 12. UI System
+
+```text
+UI
+├── HUD
+├── Menus
+├── Buttons
+├── Text
+├── Inventory
+├── Dialog
+└── UI Layout
+```
+
+### 13. Scripting Language
+
+You can expose engine functionality to another language:
+
+```text
+C++ Engine
+     │
+     ├── C++ Gameplay
+     ├── Lua
+     ├── C#
+     └── Python
+```
+
+For a first engine, **C++ + embedded Lua** can be a useful architecture.
+
+### 14. Editor
+
+A professional engine usually needs development tools.
+
+```text
+Editor
+├── Scene Editor
+├── Inspector
+├── Hierarchy
+├── Asset Browser
+├── Material Editor
+├── Animation Editor
+├── Console
+├── Profiler
+└── Debugger
+```
+
+### 15. Platform Layer
+
+Abstracts the operating system and hardware.
+
+```text
+Platform
+├── Windows
+├── Linux
+├── macOS
+├── Android
+└── iOS
+```
+
+It handles:
+
+* Window creation
+* File system
+* Input
+* Threads
+* Timers
+* GPU interfaces
+
+---
+
+## 🧩 Complete Component Map
+
+```text
+                         GAME ENGINE
+                              │
+       ┌──────────────────────┼──────────────────────┐
+       │                      │                      │
+     CORE                   RUNTIME                 TOOLS
+       │                      │                      │
+       ├── Game Loop          ├── Rendering          ├── Editor
+       ├── ECS                ├── Physics            ├── Profiler
+       ├── Memory             ├── Audio              ├── Debugger
+       ├── Events             ├── Animation          ├── Asset Tools
+       ├── Threads            ├── Input              └── Build Tools
+       └── Logging            ├── AI
+                              ├── Networking
+                              ├── UI
+                              ├── Scene
+                              └── Scripting
+                                       │
+                              ┌────────▼────────┐
+                              │ Platform Layer  │
+                              ├─────────────────┤
+                              │ OS / Window     │
+                              │ File System     │
+                              │ Input           │
+                              │ Graphics API    │
+                              └─────────────────┘
+```
+
+### If you're building your own engine
+
+I'd implement the components in this order:
+
+**Game Loop → Window/Input → Renderer → ECS → Asset Manager → Scene System → Physics → Audio → Animation → UI → Editor → Networking → Advanced Rendering.**
+
+This gives you a working engine early instead of spending months building subsystems before you can actually run a game.
+Absolutely. If your goal is to build a **serious game engine from scratch**, use a layered stack from **low-level systems → engine → tools → games**.
+
+# 🎮 Game Engine — Full Technology Stack
+
+```text
+┌──────────────────────────────────────────────────────────┐
+│                    GAME / APPLICATION                    │
+│       Gameplay • AI • UI • Scripts • Game Rules          │
+├──────────────────────────────────────────────────────────┤
+│                    ENGINE TOOLS                          │
+│       Editor • Profiler • Debugger • Asset Pipeline      │
+├──────────────────────────────────────────────────────────┤
+│                    ENGINE RUNTIME                        │
+│ Rendering • Physics • Audio • Animation • ECS • AI       │
+├──────────────────────────────────────────────────────────┤
+│                    ENGINE CORE                           │
+│ Game Loop • Memory • Jobs • Events • Resources • Math    │
+├──────────────────────────────────────────────────────────┤
+│                    PLATFORM                              │
+│ Window • Input • Filesystem • Threads • Networking       │
+├──────────────────────────────────────────────────────────┤
+│                 GRAPHICS / HARDWARE                      │
+│ Vulkan • DirectX 12 • Metal • GPU • CPU                  │
+├──────────────────────────────────────────────────────────┤
+│                    OPERATING SYSTEM                      │
+│ Windows • Linux • macOS                                  │
+├──────────────────────────────────────────────────────────┤
+│                       HARDWARE                           │
+│ CPU • GPU • RAM • SSD • Audio • Controller               │
+└──────────────────────────────────────────────────────────┘
+```
+
+## 1. Programming Languages
+
+### Primary
+
+**C++20/23**
+
+Use C++ for:
+
+* Engine core
+* ECS
+* Renderer
+* Physics integration
+* Memory management
+* Multithreading
+* Asset system
+* Platform abstraction
+
+```text
+C++ 
+ ├── Engine
+ ├── Renderer
+ ├── Physics
+ ├── Audio
+ ├── ECS
+ └── Editor
+```
+
+### Secondary
+
+**Lua**
+
+For lightweight gameplay scripting.
+
+```lua
+player:set_position(10, 5, 2)
+player:play_animation("run")
+```
+
+### Optional
+
+**Python**
+
+Use primarily for:
+
+* Asset processing
+* Build scripts
+* Automation
+* Data conversion
+* ML/AI tooling
+
+Don't make Python the core runtime language.
+
+---
+
+# 2. Build System
+
+### CMake
+
+```text
+CMake
+   ↓
+Ninja
+   ↓
+Clang / MSVC / GCC
+```
+
+Recommended:
+
+* CMake
+* Ninja
+* vcpkg or Conan
+* Git
+* GitHub Actions
+
+Project:
+
+```text
+CMakeLists.txt
+CMakePresets.json
+```
+
+---
+
+# 3. Compiler / Toolchain
+
+### Windows
+
+```text
+MSVC
+Visual Studio
+Windows SDK
+```
+
+### Linux
+
+```text
+Clang
+GCC
+Linux SDK
+```
+
+### macOS
+
+```text
+Clang
+Xcode SDK
+Metal
+```
+
+For cross-platform development:
+
+```text
+C++ + CMake
+      ↓
+┌─────┼─────────┐
+│     │         │
+Win  Linux    macOS
+```
+
+---
+
+# 4. Operating System / Platform Layer
+
+Use a platform abstraction.
+
+```text
+Platform API
+      │
+ ┌────┼────┐
+ │    │    │
+Win Linux Mac
+```
+
+### Recommended library
+
+**SDL3**
+
+Handles:
+
+* Window creation
+* Keyboard
+* Mouse
+* Gamepad
+* Audio
+* Platform abstraction
+
+Alternative:
+
+**GLFW** for primarily window/input functionality.
+
+For your own engine, I'd lean toward **SDL3** because it covers more platform functionality.
+
+---
+
+# 5. Graphics API
+
+This is the most important low-level technology after C++.
+
+### Modern stack
+
+```text
+Renderer
+   │
+   ├── Vulkan
+   ├── DirectX 12
+   └── Metal
+```
+
+### Recommended development path
+
+Start:
+
+```text
+OpenGL
+```
+
+Then move to:
+
+```text
+Vulkan
+```
+
+If your objective is a production-quality modern renderer:
+
+```text
+Vulkan + DX12 + Metal abstraction
+```
+
+### Graphics concepts to learn
+
+```text
+GPU
+ ↓
+Command Buffer
+ ↓
+Pipeline
+ ↓
+Shader
+ ↓
+Vertex Buffer
+ ↓
+Index Buffer
+ ↓
+Texture
+ ↓
+Render Target
+```
+
+---
+
+# 6. Shader Technology
+
+Learn:
+
+```text
+GLSL
+HLSL
+SPIR-V
+```
+
+Modern architecture:
+
+```text
+Shader Source
+     ↓
+Compiler
+     ↓
+SPIR-V
+     ↓
+Vulkan
+```
+
+For DirectX:
+
+```text
+HLSL
+ ↓
+DXIL
+ ↓
+DirectX 12
+```
+
+Eventually build:
+
+```text
+ShaderManager
+ShaderCompiler
+ShaderCache
+Reflection
+```
+
+---
+
+# 7. Mathematics Library
+
+A game engine needs extensive math.
+
+```text
+Math
+├── Vector2
+├── Vector3
+├── Vector4
+├── Matrix4
+├── Quaternion
+├── Transform
+├── Plane
+├── Ray
+├── AABB
+├── Frustum
+└── Interpolation
+```
+
+You can initially use:
+
+**GLM**
+
+Later, implement your own optimized math layer where useful.
+
+---
+
+# 8. ECS
+
+You have two approaches.
+
+### Build yourself
+
+```text
+Entity
+Component
+System
+Registry
+Archetype
+Query
+```
+
+### Or use an existing ECS
+
+Examples include:
+
+* EnTT
+* Flecs
+
+A production architecture might eventually look like:
+
+```text
+World
+ │
+ ├── Entity
+ │
+ ├── Components
+ │
+ └── Systems
+       ├── RenderSystem
+       ├── PhysicsSystem
+       ├── AISystem
+       └── AnimationSystem
+```
+
+---
+
+# 9. Memory Management
+
+For a serious engine, don't rely entirely on general-purpose allocations.
+
+Learn:
+
+```text
+malloc/free
+new/delete
+RAII
+Smart Pointers
+Memory Pools
+Arena Allocators
+Stack Allocators
+Linear Allocators
+Object Pools
+```
+
+Architecture:
+
+```text
+MemoryManager
+├── FrameAllocator
+├── LinearAllocator
+├── PoolAllocator
+└── GeneralAllocator
+```
+
+This becomes important for performance.
+
+---
+
+# 10. Multithreading / Job System
+
+Modern games use many CPU cores.
+
+Use:
+
+```text
+std::thread
+std::jthread
+std::atomic
+std::mutex
+std::condition_variable
+```
+
+Build:
+
+```text
+JobSystem
+     │
+     ├── Worker 1
+     ├── Worker 2
+     ├── Worker 3
+     ├── Worker 4
+     └── Worker N
+```
+
+Later:
+
+```text
+Task Graph
+    ↓
+Dependency Graph
+    ↓
+Worker Threads
+```
+
+---
+
+# 11. Physics
+
+Don't initially write your own complete physics engine.
+
+Use:
+
+### Jolt Physics
+
+or
+
+### Bullet
+
+Architecture:
+
+```text
+PhysicsSystem
+     ↓
+Physics World
+     ↓
+RigidBody
+     ↓
+Collider
+     ↓
+Collision Detection
+```
+
+Later you can build your own physics implementation to understand the internals.
+
+---
+
+# 12. Audio
+
+Use:
+
+### miniaudio
+
+Good for a lightweight engine.
+
+Alternative:
+
+### FMOD
+
+For more advanced commercial audio workflows.
+
+Architecture:
+
+```text
+AudioSystem
+├── AudioSource
+├── AudioListener
+├── Mixer
+├── SoundBank
+└── 3D Audio
+```
+
+---
+
+# 13. Asset Pipeline
+
+This is a major part of a real engine.
+
+### 3D models
+
+Use:
+
+**Assimp**
+
+Formats:
+
+```text
+FBX
+GLTF
+OBJ
+```
+
+### Textures
+
+```text
+PNG
+JPG
+TGA
+KTX2
+DDS
+```
+
+For modern GPU texture compression:
+
+```text
+BCn
+ASTC
+ETC2
+```
+
+Architecture:
+
+```text
+Raw Asset
+    ↓
+Importer
+    ↓
+Processor
+    ↓
+Engine Format
+    ↓
+Asset Database
+    ↓
+Runtime
+```
+
+---
+
+# 14. Scene Serialization
+
+Use:
+
+```text
+JSON
+YAML
+Binary
+```
+
+For development:
+
+```text
+JSON
+```
+
+For runtime:
+
+```text
+Binary
+```
+
+Example:
+
+```text
+Scene.json
+    ↓
+SceneLoader
+    ↓
+Entities
+    ↓
+Components
+```
+
+---
+
+# 15. Animation
+
+Technology:
+
+```text
+Skeleton
+Bone
+Animation Clip
+Animator
+State Machine
+Blend Tree
+IK
+```
+
+Potential libraries:
+
+```text
+Assimp
+glm
+Custom animation runtime
+```
+
+---
+
+# 16. AI
+
+For game AI:
+
+```text
+AI System
+├── Navigation
+├── Pathfinding
+├── Behavior Tree
+├── State Machine
+├── Utility AI
+└── Perception
+```
+
+Algorithms:
+
+```text
+A*
+Dijkstra
+NavMesh
+BFS
+DFS
+```
+
+For navigation:
+
+**Recast & Detour** is a strong option.
+
+---
+
+# 17. Networking
+
+For multiplayer:
+
+```text
+Networking
+├── UDP
+├── TCP
+├── Serialization
+├── Replication
+├── Client Prediction
+├── Interpolation
+└── Server Authority
+```
+
+Low-level:
+
+```text
+UDP
+ ↓
+Reliable UDP layer
+ ↓
+Game Protocol
+```
+
+Libraries worth evaluating:
+
+* ENet
+* GameNetworkingSockets
+* standalone Asio
+
+---
+
+# 18. UI
+
+For your editor:
+
+### Dear ImGui
+
+Excellent choice.
+
+```text
+Editor
+ ├── Hierarchy
+ ├── Inspector
+ ├── Console
+ ├── Profiler
+ ├── Asset Browser
+ └── Debug Windows
+```
+
+For game UI, build a separate UI runtime rather than making ImGui your final game's UI system.
+
+---
+
+# 19. Editor
+
+Your engine eventually needs:
+
+```text
+GameEngineEditor
+│
+├── Scene View
+├── Game View
+├── Hierarchy
+├── Inspector
+├── Asset Browser
+├── Material Editor
+├── Shader Editor
+├── Animation Editor
+├── Console
+└── Profiler
+```
+
+Technology:
+
+```text
+C++
+SDL3
+Dear ImGui
+ImGui docking
+Renderer
+ECS
+```
+
+---
+
+# 20. Debugging / Profiling
+
+Essential for serious engine development.
+
+Use:
+
+```text
+Visual Studio Debugger
+LLDB
+GDB
+RenderDoc
+Tracy
+AddressSanitizer
+ThreadSanitizer
+Valgrind
+```
+
+Especially learn:
+
+### RenderDoc
+
+For GPU debugging.
+
+### Tracy
+
+For CPU/GPU profiling.
+
+---
+
+# 21. Testing
+
+Use:
+
+### Catch2
+
+or
+
+### GoogleTest
+
+Test:
+
+```text
+Math
+ECS
+Physics
+Asset Loading
+Serialization
+Networking
+Memory
+Renderer
+```
+
+Example:
+
+```text
+Tests/
+├── MathTests
+├── ECSTests
+├── PhysicsTests
+├── AssetTests
+└── SerializationTests
+```
+
+---
+
+# 22. Logging
+
+Use:
+
+### spdlog
+
+Architecture:
+
+```text
+Engine
+   ↓
+Logger
+   ├── Console
+   ├── File
+   └── Debug Output
+```
+
+---
+
+# 23. Serialization / Reflection
+
+Eventually you need:
+
+```text
+Reflection
+Serialization
+Deserialization
+Editor Inspection
+```
+
+Example:
+
+```text
+Transform
+├── Position
+├── Rotation
+└── Scale
+```
+
+Editor can automatically discover these properties.
+
+---
+
+# 24. Version Control / CI/CD
+
+```text
+Git
+  ↓
+GitHub
+  ↓
+GitHub Actions
+  ↓
+Build
+  ↓
+Unit Tests
+  ↓
+Packaging
+  ↓
+Release
+```
+
+Build matrix:
+
+```text
+Windows
+Linux
+macOS
+```
+
+---
+
+# 🏗️ Recommended Final Stack
+
+If **I were designing your engine today**, I'd use:
+
+| Layer            | Technology                       |
+| ---------------- | -------------------------------- |
+| Language         | **C++23**                        |
+| Build            | **CMake + Ninja**                |
+| Package Manager  | **vcpkg / Conan**                |
+| Compiler         | **Clang / MSVC / GCC**           |
+| Platform         | **SDL3**                         |
+| Graphics         | **Vulkan**                       |
+| Windows Graphics | **DirectX 12**                   |
+| macOS Graphics   | **Metal**                        |
+| Shader           | **GLSL + HLSL + SPIR-V**         |
+| Math             | **GLM initially**                |
+| ECS              | **EnTT initially**               |
+| Physics          | **Jolt Physics**                 |
+| Audio            | **miniaudio**                    |
+| 3D Import        | **Assimp / glTF**                |
+| Navigation       | **Recast & Detour**              |
+| Editor UI        | **Dear ImGui**                   |
+| Networking       | **ENet / GameNetworkingSockets** |
+| Logging          | **spdlog**                       |
+| Profiling        | **Tracy**                        |
+| GPU Debugging    | **RenderDoc**                    |
+| Testing          | **Catch2 / GoogleTest**          |
+| Scripting        | **Lua**                          |
+| Serialization    | **JSON + custom binary**         |
+| Version Control  | **Git + GitHub**                 |
+| CI/CD            | **GitHub Actions**               |
+| Documentation    | **Doxygen + Markdown**           |
+
+## 🔥 Low-Level → High-Level Learning Path
+
+```text
+                    GAME
+                     ↑
+              Gameplay / Lua
+                     ↑
+          ┌──────────┴──────────┐
+          │      ENGINE         │
+          │                     │
+          │ ECS  Physics Audio  │
+          │ Rendering Animation │
+          │ AI   Networking UI  │
+          └──────────┬──────────┘
+                     ↑
+              ENGINE CORE
+                     │
+          ┌──────────┼──────────┐
+          │          │          │
+       Memory      Threads     Math
+          │          │          │
+          └──────────┼──────────┘
+                     ↑
+                 PLATFORM
+                     │
+              SDL3 / OS APIs
+                     ↑
+              GRAPHICS APIs
+                     │
+          Vulkan / DX12 / Metal
+                     ↑
+                  GPU/CPU
+                     ↑
+                HARDWARE
+```
+
+### 🚀 Build order
+
+```text
+1. C++23
+   ↓
+2. CMake + Git
+   ↓
+3. SDL3 Window
+   ↓
+4. Game Loop
+   ↓
+5. Input
+   ↓
+6. Math
+   ↓
+7. OpenGL Renderer
+   ↓
+8. ECS
+   ↓
+9. Asset Manager
+   ↓
+10. Scene System
+   ↓
+11. Vulkan Renderer
+   ↓
+12. Physics
+   ↓
+13. Audio
+   ↓
+14. Animation
+   ↓
+15. AI
+   ↓
+16. Networking
+   ↓
+17. Editor
+   ↓
+18. Profiler
+   ↓
+19. Scripting
+   ↓
+20. Complete Game
+```
+
+**Key principle:** don't try to build Vulkan, physics, audio, networking, ECS, and an editor simultaneously. Build a tiny **2D/3D vertical slice first**, then replace individual subsystems with more advanced implementations. This lets you turn the project into a real engine rather than a collection of unfinished modules.
+
+
+Yes. If you want to **actually build your own game engine**, don't start with the editor, physics, AI, or networking. Build it bottom-up and make a small game run as early as possible.
+
+# 🎮 Build Your Own Game Engine — Step by Step
+
+## Overall roadmap
+
+```text
+PHASE 0   Development Environment
+    ↓
+PHASE 1   Window + Application
+    ↓
+PHASE 2   Game Loop + Time
+    ↓
+PHASE 3   Input System
+    ↓
+PHASE 4   Math Library
+    ↓
+PHASE 5   2D Renderer
+    ↓
+PHASE 6   Entity Component System
+    ↓
+PHASE 7   Asset System
+    ↓
+PHASE 8   Scene System
+    ↓
+PHASE 9   3D Renderer
+    ↓
+PHASE 10  Physics
+    ↓
+PHASE 11  Audio
+    ↓
+PHASE 12  Animation
+    ↓
+PHASE 13  AI
+    ↓
+PHASE 14  UI
+    ↓
+PHASE 15  Scripting
+    ↓
+PHASE 16  Editor
+    ↓
+PHASE 17  Profiler / Debugging
+    ↓
+PHASE 18  Networking
+    ↓
+PHASE 19  Packaging / Deployment
+    ↓
+       GAME ENGINE
+```
+
+---
+
+# PHASE 0 — Development Environment
+
+Start with:
+
+```text
+C++23
+CMake
+Ninja
+Git
+GitHub
+VS Code / Visual Studio / CLion
+```
+
+Install:
+
+```text
+Compiler
+├── Clang
+└── MSVC/GCC
+
+Build
+├── CMake
+└── Ninja
+
+Debug
+├── GDB/LLDB
+├── RenderDoc
+└── Tracy
+```
+
+Create:
+
+```text
+MyEngine/
+├── Engine/
+├── Game/
+├── Editor/
+├── Tests/
+├── Assets/
+├── Examples/
+├── CMakeLists.txt
+└── README.md
+```
+
+### First milestone
+
+You should be able to run:
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+and get:
+
+```text
+Hello MyEngine
+```
+
+---
+
+# PHASE 1 — Create a Window
+
+Use **SDL3** initially.
+
+Architecture:
+
+```text
+Application
+     ↓
+Platform
+     ↓
+SDL3
+     ↓
+Operating System
+```
+
+Create:
+
+```cpp
+class Application
+{
+public:
+    bool initialize();
+    void run();
+    void shutdown();
+};
+```
+
+First target:
+
+```text
+┌──────────────────────────┐
+│                          │
+│      My Game Engine      │
+│                          │
+└──────────────────────────┘
+```
+
+### Learn
+
+* Window creation
+* Event handling
+* Application lifecycle
+* OS events
+
+---
+
+# PHASE 2 — Build the Game Loop
+
+This is the heart of your engine.
+
+```cpp
+while (running)
+{
+    processEvents();
+
+    float dt = timer.deltaTime();
+
+    update(dt);
+
+    render();
+}
+```
+
+Architecture:
+
+```text
+Application
+     │
+     ▼
+Game Loop
+ ┌───┼────┐
+ ▼   ▼    ▼
+Input Update Render
+```
+
+Implement:
+
+```text
+Time
+Clock
+DeltaTime
+FPS
+FixedDeltaTime
+```
+
+Eventually:
+
+```text
+Variable Update
+        +
+Fixed Physics Update
+```
+
+Example:
+
+```text
+Frame
+ │
+ ├── Input
+ ├── Update
+ ├── Physics
+ ├── Animation
+ ├── Render
+ └── Present
+```
+
+---
+
+# PHASE 3 — Input System
+
+Don't let gameplay depend directly on SDL.
+
+Bad:
+
+```cpp
+SDL_GetKeyboardState(...)
+```
+
+inside your Player class.
+
+Instead:
+
+```text
+SDL3
+ ↓
+Platform Input
+ ↓
+InputManager
+ ↓
+Gameplay
+```
+
+Create:
+
+```cpp
+input.isKeyDown(Key::W);
+input.isMouseButtonDown(MouseButton::Left);
+input.getMousePosition();
+```
+
+Then introduce actions:
+
+```text
+MoveForward
+MoveBackward
+Jump
+Shoot
+Interact
+```
+
+Mapping:
+
+```text
+W
+↓
+MoveForward
+```
+
+Later:
+
+```text
+Gamepad Stick
+       ↓
+MoveForward
+```
+
+---
+
+# PHASE 4 — Math Library
+
+Before serious graphics, learn/build the math layer.
+
+```text
+Vector2
+Vector3
+Vector4
+
+Matrix3
+Matrix4
+
+Quaternion
+
+Transform
+```
+
+Then:
+
+```text
+Ray
+Plane
+AABB
+Sphere
+Frustum
+```
+
+Important operations:
+
+```text
+Vector
+├── Add
+├── Subtract
+├── Dot
+├── Cross
+├── Normalize
+└── Length
+
+Matrix
+├── Translation
+├── Rotation
+├── Scale
+├── Projection
+└── View
+
+Quaternion
+├── Rotation
+├── Multiply
+└── Slerp
+```
+
+Initially use **GLM** rather than spending months writing your own math library.
+
+---
+
+# PHASE 5 — First Renderer
+
+Start with **OpenGL** so you can understand the graphics pipeline without immediately dealing with Vulkan's complexity.
+
+Architecture:
+
+```text
+Renderer
+    ↓
+Graphics API
+    ↓
+GPU
+```
+
+Build:
+
+### Step 1
+
+Clear screen.
+
+```text
+████████████████
+████████████████
+████████████████
+```
+
+### Step 2
+
+Draw triangle.
+
+```text
+       ▲
+      / \
+     /   \
+    /_____\
+```
+
+### Step 3
+
+Draw rectangle.
+
+### Step 4
+
+Create vertex buffers.
+
+```text
+VertexBuffer
+IndexBuffer
+VertexArray
+```
+
+### Step 5
+
+Shaders.
+
+```text
+Vertex Shader
+      ↓
+Rasterization
+      ↓
+Fragment Shader
+```
+
+### Step 6
+
+Textures.
+
+### Step 7
+
+Camera.
+
+### Step 8
+
+Sprites.
+
+At this point you can make a simple 2D game.
+
+---
+
+# PHASE 6 — ECS
+
+Now introduce your entity system.
+
+```text
+Entity
+  │
+  ├── Transform
+  ├── Sprite
+  └── Player
+```
+
+Instead of giant inheritance hierarchies:
+
+```text
+GameObject
+ ├── Player
+ ├── Enemy
+ ├── Vehicle
+ └── NPC
+```
+
+use:
+
+```text
+Entity 100
+├── Transform
+├── Sprite
+└── Health
+```
+
+Systems:
+
+```text
+MovementSystem
+RenderSystem
+PhysicsSystem
+AudioSystem
+```
+
+For the first version, **EnTT** is a practical choice.
+
+---
+
+# PHASE 7 — Asset System
+
+Now your engine needs to load resources.
+
+```text
+AssetManager
+      │
+ ┌────┼──────────┐
+ ▼    ▼          ▼
+Texture Mesh    Audio
+```
+
+Implement:
+
+```cpp
+TextureHandle loadTexture(path);
+MeshHandle loadMesh(path);
+ShaderHandle loadShader(path);
+```
+
+Add caching:
+
+```text
+load player.png
+      ↓
+Already loaded?
+ ┌────┴─────┐
+Yes         No
+ ↓           ↓
+Return      Load
+             ↓
+           Cache
+```
+
+Then implement asset handles instead of passing raw pointers everywhere.
+
+---
+
+# PHASE 8 — Scene System
+
+Create:
+
+```text
+Scene
+World
+Entity
+Component
+```
+
+Example:
+
+```text
+Scene: Level1
+
+Entities:
+ ├── Player
+ ├── Enemy1
+ ├── Enemy2
+ ├── Camera
+ └── Light
+```
+
+Save:
+
+```text
+Level1.scene
+```
+
+Load:
+
+```text
+SceneLoader
+     ↓
+Deserialize
+     ↓
+Create Entities
+     ↓
+Attach Components
+```
+
+Use JSON initially.
+
+---
+
+# PHASE 9 — Move to 3D
+
+Now start the serious rendering work.
+
+```text
+2D Renderer
+     ↓
+3D Renderer
+```
+
+Learn:
+
+```text
+World Space
+View Space
+Clip Space
+NDC
+Perspective Projection
+Depth Buffer
+```
+
+Build:
+
+```text
+Camera
+   ↓
+Mesh
+   ↓
+Material
+   ↓
+Shader
+   ↓
+Texture
+   ↓
+Lighting
+```
+
+Your milestone:
+
+```text
+        ☀
+        │
+      Cube
+       /\
+      /  \
+     /____\
+```
+
+Then:
+
+* Directional light
+* Point light
+* Spot light
+* Shadows
+* Normal mapping
+* PBR
+
+---
+
+# PHASE 10 — Vulkan
+
+Once you understand OpenGL, build a second renderer.
+
+```text
+Engine Renderer
+       │
+ ┌─────┴─────┐
+ ▼           ▼
+OpenGL      Vulkan
+```
+
+Create an abstraction:
+
+```cpp
+class Renderer
+{
+public:
+    virtual void beginFrame() = 0;
+    virtual void draw() = 0;
+    virtual void endFrame() = 0;
+};
+```
+
+Then:
+
+```text
+OpenGLRenderer
+VulkanRenderer
+```
+
+Learn:
+
+```text
+Instance
+Physical Device
+Logical Device
+Queue
+Command Buffer
+Swapchain
+Render Pass
+Pipeline
+Descriptor Set
+Synchronization
+GPU Memory
+```
+
+Don't start here. Vulkan is much easier after you understand the graphics pipeline.
+
+---
+
+# PHASE 11 — Physics
+
+Integrate **Jolt Physics** initially.
+
+Your engine:
+
+```text
+PhysicsSystem
+       ↓
+Jolt
+       ↓
+Physics World
+```
+
+Components:
+
+```text
+RigidBody
+Collider
+CharacterController
+```
+
+Implement:
+
+```text
+Gravity
+Collision
+Raycast
+Trigger
+Rigid Body
+```
+
+Gameplay:
+
+```text
+Player
+ ↓
+Input
+ ↓
+Character Controller
+ ↓
+Physics
+ ↓
+Transform
+ ↓
+Renderer
+```
+
+---
+
+# PHASE 12 — Audio
+
+Add:
+
+```text
+AudioSystem
+```
+
+Components:
+
+```text
+AudioSource
+AudioListener
+```
+
+Flow:
+
+```text
+Gameplay
+   ↓
+AudioSystem
+   ↓
+Mixer
+   ↓
+Audio Device
+```
+
+Support:
+
+```text
+SFX
+Music
+3D Audio
+Volume
+Pitch
+Looping
+```
+
+---
+
+# PHASE 13 — Animation
+
+Start with skeletal animation.
+
+```text
+Model
+ ↓
+Skeleton
+ ↓
+Bones
+ ↓
+Animation Clips
+ ↓
+Animator
+```
+
+Then:
+
+```text
+Idle
+ ↓
+Walk
+ ↓
+Run
+ ↓
+Jump
+```
+
+Build an animation state machine:
+
+```text
+Animator
+ ├── Idle
+ ├── Walk
+ ├── Run
+ └── Jump
+```
+
+---
+
+# PHASE 14 — AI
+
+Start simple.
+
+```text
+AI
+├── State Machine
+├── A*
+├── Navigation
+└── Behavior Tree
+```
+
+Example:
+
+```text
+Enemy
+
+        Player visible?
+          /     \
+        Yes      No
+        ↓        ↓
+      Attack   Patrol
+```
+
+Later:
+
+```text
+NavMesh
+A*
+Behavior Tree
+Utility AI
+```
+
+Use **Recast/Detour** for navigation if you don't want to implement NavMesh from scratch.
+
+---
+
+# PHASE 15 — UI
+
+Build two systems.
+
+### Editor UI
+
+Use:
+
+**Dear ImGui**
+
+```text
+Hierarchy
+Inspector
+Console
+Profiler
+Asset Browser
+```
+
+### Game UI
+
+Build your own runtime UI:
+
+```text
+Canvas
+Panel
+Button
+Text
+Image
+ProgressBar
+```
+
+---
+
+# PHASE 16 — Scripting
+
+Now allow game developers to write gameplay separately from engine code.
+
+```text
+C++ Engine
+      │
+      ▼
+Scripting API
+      │
+      ▼
+Lua
+```
+
+Example:
+
+```lua
+function Player:update(dt)
+
+    if input:is_pressed("Jump") then
+        self:jump()
+    end
+
+end
+```
+
+Expose:
+
+```text
+Entity
+Transform
+Input
+Audio
+Physics
+Animation
+UI
+```
+
+---
+
+# PHASE 17 — Editor
+
+Only now build your serious editor.
+
+```text
+┌───────────────────────────────────────────────────┐
+│ File  Edit  View  Game  Build                     │
+├────────────┬──────────────────────┬───────────────┤
+│ Hierarchy  │                      │ Inspector     │
+│            │                      │               │
+│ Player     │       Scene          │ Transform     │
+│ Enemy      │       View           │ Mesh          │
+│ Camera     │                      │ Material      │
+│ Light      │                      │ Physics       │
+│            │                      │               │
+├────────────┴──────────────────────┴───────────────┤
+│ Console │ Assets │ Profiler │ Debug               │
+└───────────────────────────────────────────────────┘
+```
+
+Editor features:
+
+```text
+Scene Editor
+Hierarchy
+Inspector
+Asset Browser
+Material Editor
+Shader Editor
+Animation Editor
+Console
+Profiler
+```
+
+---
+
+# PHASE 18 — Job System
+
+Now optimize CPU work.
+
+```text
+Main Thread
+     │
+     ▼
+Job System
+ ┌───┼────┬────┐
+ ▼   ▼    ▼    ▼
+Job Job  Job  Job
+```
+
+Example:
+
+```text
+Frame
+ │
+ ├── Animation Job
+ ├── Physics Job
+ ├── AI Job
+ ├── Visibility Job
+ └── Asset Job
+```
+
+Use:
+
+```text
+std::thread
+std::atomic
+std::condition_variable
+```
+
+Then build your own worker pool/task graph.
+
+---
+
+# PHASE 19 — Profiler
+
+You cannot optimize what you cannot measure.
+
+Track:
+
+```text
+CPU Frame Time
+GPU Frame Time
+Draw Calls
+Memory
+Allocations
+Entity Count
+Physics Time
+Animation Time
+AI Time
+```
+
+Use:
+
+**Tracy**
+
+and:
+
+**RenderDoc**
+
+Architecture:
+
+```text
+Engine
+ ↓
+Profiler
+ ├── CPU
+ ├── GPU
+ ├── Memory
+ └── Rendering
+```
+
+---
+
+# PHASE 20 — Networking
+
+Only after the single-player engine works.
+
+```text
+Client
+  │
+  │ UDP
+  ▼
+Server
+```
+
+Implement:
+
+```text
+Connection
+Packet
+Serialization
+Replication
+Server Authority
+Client Prediction
+Interpolation
+Lag Compensation
+```
+
+Start with a tiny multiplayer prototype.
+
+---
+
+# PHASE 21 — Packaging
+
+Finally:
+
+```text
+Game
+ ↓
+Build System
+ ↓
+Asset Cooker
+ ↓
+Executable
+ ↓
+Package
+```
+
+Example:
+
+```text
+Build/
+├── Game.exe
+├── Engine.dll
+├── Assets/
+├── Shaders/
+└── Config/
+```
+
+For release:
+
+```text
+Source Assets
+      ↓
+Asset Cooker
+      ↓
+Compressed Runtime Assets
+      ↓
+Game Package
+```
+
+---
+
+# 🧠 The Most Important Architecture
+
+Eventually you want:
+
+```text
+                     GAME
+                      │
+                      ▼
+               ┌─────────────┐
+               │   Gameplay  │
+               └──────┬──────┘
+                      │
+                      ▼
+                 ENGINE API
+                      │
+       ┌──────────────┼──────────────┐
+       ▼              ▼              ▼
+      ECS          Systems         Assets
+       │              │              │
+       └──────────────┼──────────────┘
+                      ▼
+                 ENGINE CORE
+                      │
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+      Memory       Threading       Math
+        │             │             │
+        └─────────────┼─────────────┘
+                      ▼
+                 PLATFORM
+                      │
+            ┌─────────┼─────────┐
+            ▼         ▼         ▼
+          SDL3      OS API    Filesystem
+                      │
+                      ▼
+                 HARDWARE
+```
+
+# 🗺️ Your First 12 Months
+
+Don't try to finish everything immediately.
+
+| Month | Goal                       |
+| ----- | -------------------------- |
+| 1     | C++ + CMake + SDL3         |
+| 2     | Game loop + Input + Math   |
+| 3     | 2D Renderer                |
+| 4     | ECS                        |
+| 5     | Asset + Scene System       |
+| 6     | 3D Renderer                |
+| 7     | Physics + Audio            |
+| 8     | Animation + AI             |
+| 9     | UI + Scripting             |
+| 10    | Editor                     |
+| 11    | Profiling + Multithreading |
+| 12    | Multiplayer + Packaging    |
+
+## 🎯 First game milestone
+
+Don't aim for "build Unreal Engine."
+
+Aim for this:
+
+```text
+             YOUR ENGINE
+
+        ┌──────────────────┐
+        │      Player      │
+        │        🧍        │
+        │                  │
+        │   🧱       👾    │
+        │                  │
+        │       🏁         │
+        └──────────────────┘
+
+        ↓
+      Input
+        ↓
+      ECS
+        ↓
+    Physics
+        ↓
+    Renderer
+        ↓
+      Audio
+```
+
+Build a **small 2D platformer** with your engine first. Once that works end-to-end, move to 3D. That single decision will dramatically reduce the complexity of the project while giving you a complete engine architecture to evolve.
